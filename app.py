@@ -303,29 +303,16 @@ strata_col = st.selectbox(
 )
 
 # Estimation stratifiée
-def stratified_estimation(df, strata_col, value_col, N_dict=None, z=1.96, default_multiplier=3):
+def stratified_estimation(df, strata_col, value_col, N_dict, z=1.96):
     results = []
     for h, group in df.groupby(strata_col):
         nh = len(group)                       # échantillon
-
-        # Population réelle (Nh) : si non fournie, on prend un multiple pour éviter Nh = nh
-        if N_dict and h in N_dict:
-            Nh = N_dict[h]
-        else:
-            Nh = max(nh * default_multiplier, nh + 1)  # toujours > nh
-
+        Nh = N_dict.get(h, nh)                # population réelle (à fournir si connue)
         xh_bar = group[value_col].mean()      # moyenne observée
         sh = group[value_col].std(ddof=1)     # écart-type
 
         Th = Nh * xh_bar                      # total estimé
-
-        # Calcul de la variance avec correction si Nh > nh
-        if nh > 1 and Nh > nh:
-            var_Th = (Nh**2 * sh**2 / nh) * ((Nh - nh) / (Nh - 1))
-        elif nh > 1:
-            var_Th = (Nh**2 * sh**2 / nh)
-        else:
-            var_Th = 0
+        var_Th = (Nh**2 * sh**2 / nh) * ((Nh - nh) / (Nh - 1)) if nh > 1 else 0
 
         results.append({
             "Strate": h,
@@ -345,8 +332,8 @@ def stratified_estimation(df, strata_col, value_col, N_dict=None, z=1.96, defaul
 
     return res_df, T_hat, Var_T, (IC_low, IC_high)
 
-# Si tu n'as pas les vrais Nh, on laisse le code générer des Nh > nh automatiquement
-N_dict = None  # ou mettre tes vrais effectifs par strate si connus
+# ⚠️ À remplacer par les vrais Nh si tu les connais (nombre total de vols réels par strate)
+N_dict = {h: len(g) for h, g in df_filtered.groupby(strata_col)}
 
 if len(df_filtered) > 0:
     res_df, T_hat, Var_T, IC = stratified_estimation(df_filtered, strata_col, selected_delta_col, N_dict)
@@ -359,3 +346,4 @@ if len(df_filtered) > 0:
     st.write(f"**IC95% du total** : [{IC[0]:.2f}, {IC[1]:.2f}]")
 else:
     st.warning("⚠️ Aucune donnée disponible pour la stratification.")
+
