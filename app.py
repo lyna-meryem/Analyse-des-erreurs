@@ -76,18 +76,6 @@ st.write(f"Q1 = {Q1:.2f}, Q3 = {Q3:.2f}, IQR = {IQR:.2f}")
 st.write(f"Bornes : **[{borne_basse_iqr:.2f}, {borne_haute_iqr:.2f}]**")
 st.write(f"Valeurs aberrantes détectées (IQR) : {len(outliers_iqr)}")
 
-# ===== Graphique =====
-st.header("Visualisation des méthodes")
-fig, ax = plt.subplots()
-ax.boxplot(data, vert=False)
-ax.set_title("Boxplot avec IQR")
-st.pyplot(fig)
-
-
-
-
-
-
 
 
 
