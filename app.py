@@ -130,11 +130,15 @@ def select_all_cities():
 
 st.sidebar.button("Sélectionner tous les CityPairs affichés", on_click=select_all_cities)
 
+# Filtrer les valeurs par défaut pour éviter l'erreur
+default_selected = [c for c in st.session_state.selected_cities if c in filtered_city_options]
+
 selected_cities = st.sidebar.multiselect(
     "CityPair",
     options=filtered_city_options,
-    default=st.session_state.selected_cities
+    default=default_selected
 )
+
 
 # ----- Type Avion -----
 type_options = df["Type Avions IATA"].dropna().unique().tolist()
