@@ -290,6 +290,10 @@ else:
     
 col_index = df_filtered.columns.get_loc(selected_delta_col)
 lido_col = df_filtered.columns[col_index - 1]
+df_filtered[lido_col] = df_filtered[lido_col].astype(str).str.replace('[\$,]', '', regex=True)
+df_filtered[lido_col] = pd.to_numeric(df_filtered[lido_col], errors='coerce')
 
 st.write("Colonne LIDO récupérée :", lido_col)
 st.write("Premières lignes :", df_filtered[[lido_col, selected_delta_col]].head())
+
+
