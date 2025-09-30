@@ -93,26 +93,36 @@ st.write(f"📊 Nombre de vols filtrés : **{len(df_filtered)}**")
 # ---------------------------
 # 5. Bootstrap et IC95%
 # ---------------------------
-df_filtered = df_filtered.dropna(subset=[selected_delta_col])
-
 if len(df_filtered) > 0:
     NBOOT = 5000
-    boot_means = [df_filtered[selected_delta_col].sample(frac=1, replace=True).mean() for _ in range(NBOOT)]
+    boot_means = [
+        df_filtered[selected_delta_col].sample(frac=1, replace=True).mean()
+        for _ in range(NBOOT)
+    ]
+    
+    # Ici on calcule ci_low et ci_high
     ci_low, ci_high = np.percentile(boot_means, [2.5, 97.5])
     mean_observed = df_filtered[selected_delta_col].mean()
 
+    # Référence (à adapter selon ta vraie colonne)
+    mean_lido = df_filtered["[LIDO] Fuel Delta T"].mean()
+
+    if mean_lido and mean_lido != 0:
+        mean_pct = (mean_observed / mean_lido) * 100
+        ci_low_pct, ci_high_pct = (ci_low / mean_lido) * 100, (ci_high / mean_lido) * 100
+
+        st.write(f"✅ Moyenne observée en % : {mean_pct:.2f}%")
+        st.write(f"✅ Intervalle de confiance à 95% : [{ci_low_pct:.2f}%, {ci_high_pct:.2f}%]")
+
+    # Ensuite ton graphique
     fig, ax = plt.subplots(figsize=(8, 4))
     ax.hist(boot_means, bins=30, color="skyblue", edgecolor="black")
     ax.axvline(ci_low, color="red", linestyle="--", label=f"IC 2.5% = {ci_low:.2f}")
     ax.axvline(ci_high, color="red", linestyle="--", label=f"IC 97.5% = {ci_high:.2f}")
     ax.axvline(mean_observed, color="green", linestyle="-", label=f"Moyenne = {mean_observed:.2f}")
     ax.set_title(f"Distribution bootstrap de {selected_delta_col}")
-    ax.set_xlabel("Gain moyen (Delta)")
-    ax.set_ylabel("Fréquence")
-    ax.legend()
     st.pyplot(fig)
-else:
-    st.warning("⚠️ Aucun vol valide trouvé pour la colonne sélectionnée")
+
 
 # ---------------------------
 # 6. Analyse des outliers
@@ -146,6 +156,7 @@ if col_index > 0:
     mean_lido = df_filtered[lido_col].mean()
 
     mean_pct = (mean_observed / mean_lido) * 100
+    ci_low, ci_high = np.percentile(boot_means, [2.5, 97.5])
     ci_low_pct, ci_high_pct = (ci_low / mean_lido) * 100, (ci_high / mean_lido) * 100
 
     st.subheader("📊 Intervalle de confiance relatif (%)")
