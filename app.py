@@ -14,10 +14,10 @@ st.write("Formule générale :")
 st.latex(r"IC = \bar{x} \pm z_{\alpha/2} \cdot \frac{s}{\sqrt{n}}")
 
 st.write("Avec :")
-st.latex(r"x_i = \text{chaque valeur de l’échantillon}")
 st.latex(r"\overline{x} = \text{moyenne de l’échantillon}")
+st.latex(r"s = \text{écart-type}")
 st.latex(r"n = \text{taille de l’échantillon}")
-st.latex(r"s = \text{écart-type de l’échantillon}")
+st.latex(r"z_{\alpha/2} \approx 1.96 \text{ pour un IC à 95\%}")
 
 
 # Données
