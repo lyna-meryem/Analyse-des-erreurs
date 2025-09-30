@@ -266,6 +266,7 @@ if len(df_filtered) > 0:
 
 # Trouver la colonne LIDO qui précède la colonne Delta choisie
 col_index = df_filtered.columns.get_loc(selected_delta_col)
+mean_observed = df_filtered[selected_delta_col].mean()
 
 if col_index > 0:
     lido_col = df_filtered.columns[col_index - 1]  # juste avant
