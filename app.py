@@ -7,7 +7,7 @@ from scipy import stats
 
 st.title("Méthodes Statistiques d'Analyse des Données")
 
-t.header("1. Intervalle de Confiance (IC)")
+st.header("1. Intervalle de Confiance (IC)")
 st.write("L’**intervalle de confiance** permet d’estimer la plage dans laquelle se situe la moyenne réelle d’une population.")
 
 st.write("Formule générale :")
