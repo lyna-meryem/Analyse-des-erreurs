@@ -294,7 +294,7 @@ st.write("Premières lignes :", df_filtered[[lido_col, selected_delta_col]].head
 # ---------------------------
 # 7. Méthode par strates (types d’avions, citypairs)
 # ---------------------------
-st.header("7. Méthode stratifiée (Types d’avions / Citypairs)")
+st.header("4. Méthode stratifiée (Types d’avions / Citypairs)")
 
 # Choix de la strate
 strata_col = st.selectbox(
