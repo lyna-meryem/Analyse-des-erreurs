@@ -210,7 +210,8 @@ st.write(f"📊 Nombre de vols filtrés : **{len(df_filtered)}**")
 # ---------------------------
 # 5. Bootstrap et IC95%
 # ---------------------------
-
+df_filtered = df_filtered.dropna(subset=[selected_delta_col])
+st.write("DataFrame filtré :", df_filtered)
 
 if len(df_filtered) > 0:
     NBOOT = 5000
