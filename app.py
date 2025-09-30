@@ -307,8 +307,9 @@ strata_col = st.selectbox(
 def stratified_estimation(df, strata_col, value_col, N_dict, z=1.96):
     results = []
     for h, group in df.groupby(strata_col):
-        nh = random.randint(1, Nh - 1)                      # échantillon
-        Nh = N_dict.get(h, nh)                # population réelle (à fournir si connue)
+        nh = random.randint(1, len(group))                     # échantillon
+        Nh = N_dict.get(h, nh)
+        nh = random.randint(1, len(group)) # population réelle (à fournir si connue)
         xh_bar = group[value_col].mean()      # moyenne observée
         sh = group[value_col].std(ddof=1)     # écart-type
 
