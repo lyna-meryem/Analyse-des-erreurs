@@ -250,18 +250,11 @@ if len(df_filtered) > 0:
 
 
 
-# Mapping automatique Delta -> LIDO
-# Exemple de correspondances Delta -> LIDO
-mapping = {
-    "Delta Total cost (en $)": "[LIDO] New total cost (en $)",
-    "Delta Fuel cost (en $)": "[LIDO] New Fuel Cost (en $)",
-    "Delta Time related cost (en $)": "[LIDO] Time related costs (en $)",
-    "Delta ATC charges (en $)": "[LIDO] ATC charges (en $))"
-}
+# Trouver la colonne LIDO qui précède la colonne Delta choisie
+col_index = df_filtered.columns.get_loc(selected_delta_col)
 
-# Vérifier si la colonne sélectionnée a un équivalent LIDO
-if selected_delta_col in mapping:
-    lido_col = mapping[selected_delta_col]
+if col_index > 0:
+    lido_col = df_filtered.columns[col_index - 1]  # juste avant
     df_filtered[lido_col] = pd.to_numeric(df_filtered[lido_col], errors="coerce")
 
     # Moyenne LIDO
@@ -277,5 +270,4 @@ if selected_delta_col in mapping:
     st.write(f"Gain moyen relatif (Delta vs LIDO) : **{mean_pct:.2f}%**")
     st.write(f"IC95% relatif : **[{ci_low_pct:.2f}%, {ci_high_pct:.2f}%]**")
 else:
-    st.error(f"⚠️ Pas de colonne LIDO associée à {selected_delta_col}")
-
+    st.error("⚠️ Impossible de trouver la colonne LIDO correspondante.")
