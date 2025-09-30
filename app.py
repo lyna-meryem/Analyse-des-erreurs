@@ -291,4 +291,59 @@ df_filtered[lido_col] = pd.to_numeric(df_filtered[lido_col], errors='coerce')
 st.write("Colonne LIDO récupérée :", lido_col)
 st.write("Premières lignes :", df_filtered[[lido_col, selected_delta_col]].head())
 
+# ---------------------------
+# 7. Méthode par strates (types d’avions, citypairs)
+# ---------------------------
+st.header("7. Méthode stratifiée (Types d’avions / Citypairs)")
+
+# Choix de la strate
+strata_col = st.selectbox(
+    "Choisir la variable de stratification",
+    ["Type Avions IATA", "[LIDO] Citypair"]
+)
+
+# Estimation stratifiée
+def stratified_estimation(df, strata_col, value_col, N_dict, z=1.96):
+    results = []
+    for h, group in df.groupby(strata_col):
+        nh = len(group)                       # échantillon
+        Nh = N_dict.get(h, nh)                # population réelle (à fournir si connue)
+        xh_bar = group[value_col].mean()      # moyenne observée
+        sh = group[value_col].std(ddof=1)     # écart-type
+
+        Th = Nh * xh_bar                      # total estimé
+        var_Th = (Nh**2 * sh**2 / nh) * ((Nh - nh) / (Nh - 1)) if nh > 1 else 0
+
+        results.append({
+            "Strate": h,
+            "Nh (total vols)": Nh,
+            "nh (échantillon)": nh,
+            "Moyenne échantillon": xh_bar,
+            "Total estimé (Th)": Th,
+            "Variance(Th)": var_Th
+        })
+
+    res_df = pd.DataFrame(results)
+    T_hat = res_df["Total estimé (Th)"].sum()
+    Var_T = res_df["Variance(Th)"].sum()
+    SE_T = np.sqrt(Var_T)
+    ME = z * SE_T
+    IC_low, IC_high = T_hat - ME, T_hat + ME
+
+    return res_df, T_hat, Var_T, (IC_low, IC_high)
+
+# ⚠️ À remplacer par les vrais Nh si tu les connais (nombre total de vols réels par strate)
+N_dict = {h: len(g) for h, g in df_filtered.groupby(strata_col)}
+
+if len(df_filtered) > 0:
+    res_df, T_hat, Var_T, IC = stratified_estimation(df_filtered, strata_col, selected_delta_col, N_dict)
+
+    st.subheader("📊 Résultats par strate")
+    st.dataframe(res_df)
+
+    st.write(f"**Total estimé** : {T_hat:.2f}")
+    st.write(f"**Variance totale** : {Var_T:.2f}")
+    st.write(f"**IC95% du total** : [{IC[0]:.2f}, {IC[1]:.2f}]")
+else:
+    st.warning("⚠️ Aucune donnée disponible pour la stratification.")
 
