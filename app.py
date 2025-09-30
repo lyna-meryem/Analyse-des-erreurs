@@ -111,6 +111,11 @@ selected_delta_col = st.selectbox("Choisir la colonne Delta à analyser", delta_
 
 # S’assurer que la colonne choisie est bien numérique
 df[selected_delta_col] = pd.to_numeric(df[selected_delta_col], errors="coerce")
+# Type “brut” de la colonne dans le dataframe
+st.write(type(df[selected_delta_col]))
+
+# Type pandas (dtype) de la colonne
+st.write(df[selected_delta_col].dtype)
 
 # ---------------------------
 # Conversion en kg si nécessaire
