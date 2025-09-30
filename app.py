@@ -6,15 +6,12 @@ import random
 from scipy import stats
 
 
-
 # ---------------------------
 # 1. Charger les données
 # ---------------------------
 df = pd.read_csv("vols.csv", parse_dates=["[FK] Flight date"])
-
 # ---------------------------
 # 2. Sélection de la colonne Delta
-
 # ---------------------------
 # 2. Sélection de la colonne Delta
 # ---------------------------
