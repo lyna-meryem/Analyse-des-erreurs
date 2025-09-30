@@ -302,46 +302,26 @@ strata_col = st.selectbox(
     ["Type Avions IATA", "[LIDO] Citypair"]
 )
 
-import random
-
-# Nh : population réelle par strate (doit être fourni)
-N_dict = {
-    h: len(df_filtered[df_filtered[strata_col] == h]) * 2  # juste un exemple, Nh > nh
-    for h in df_filtered[strata_col].unique()
-}
-
-# Estimation stratifiée avec nh aléatoire
+# Estimation stratifiée
 def stratified_estimation(df, strata_col, value_col, N_dict, z=1.96):
-    if df.empty:
-        st.warning("⚠️ Aucune donnée disponible pour la stratification.")
-        return None, None, None, None
-
     results = []
     for h, group in df.groupby(strata_col):
-        max_nh = len(group)
-        nh = random.randint(50, max(max_nh, 50))  # nh aléatoire entre 50 et max disponible
-        Nh = N_dict.get(h)
-        if Nh is None or Nh <= nh:
-            st.warning(f"Nh non défini ou trop petit pour la strate {h}, on ignore cette strate.")
-            continue
+        nh = len(group)                       # échantillon
+        Nh = N_dict.get(h, nh)                # population réelle (à fournir si connue)
+        xh_bar = group[value_col].mean()      # moyenne observée
+        sh = group[value_col].std(ddof=1)     # écart-type
 
-        xh_bar = group[value_col].mean()
-        sh = group[value_col].std(ddof=1)
-        Th = Nh * xh_bar
-        var_Th = (Nh**2 * sh**2 / nh) * ((Nh - nh) / Nh) if nh > 1 else 0
+        Th = Nh * xh_bar                      # total estimé
+        var_Th = (Nh**2 * sh**2 / nh) * ((Nh - nh) / (Nh - 1)) if nh > 1 else 0
 
         results.append({
             "Strate": h,
             "Nh (total vols)": Nh,
-            "nh (échantillon aléatoire)": nh,
+            "nh (échantillon)": nh,
             "Moyenne échantillon": xh_bar,
             "Total estimé (Th)": Th,
             "Variance(Th)": var_Th
         })
-
-    if not results:
-        st.warning("⚠️ Aucune strate valide à afficher.")
-        return None, None, None, None
 
     res_df = pd.DataFrame(results)
     T_hat = res_df["Total estimé (Th)"].sum()
@@ -352,14 +332,18 @@ def stratified_estimation(df, strata_col, value_col, N_dict, z=1.96):
 
     return res_df, T_hat, Var_T, (IC_low, IC_high)
 
+# ⚠️ À remplacer par les vrais Nh si tu les connais (nombre total de vols réels par strate)
+N_dict = {h: len(g) for h, g in df_filtered.groupby(strata_col)}
 
-# Appel de la fonction
-selected_delta_col = st.selectbox("Choisir la colonne à analyser", df_filtered.columns)
-res_df, T_hat, Var_T, IC = stratified_estimation(df_filtered, strata_col, selected_delta_col, N_dict)
+if len(df_filtered) > 0:
+    res_df, T_hat, Var_T, IC = stratified_estimation(df_filtered, strata_col, selected_delta_col, N_dict)
 
-if res_df is not None:
-    st.subheader("Résultats par strate")
+    st.subheader("📊 Résultats par strate")
     st.dataframe(res_df)
+
     st.write(f"**Total estimé** : {T_hat:.2f}")
     st.write(f"**Variance totale** : {Var_T:.2f}")
     st.write(f"**IC95% du total** : [{IC[0]:.2f}, {IC[1]:.2f}]")
+else:
+    st.warning("⚠️ Aucune donnée disponible pour la stratification.")
+
