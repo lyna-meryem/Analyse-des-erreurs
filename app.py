@@ -119,6 +119,7 @@ st.sidebar.header("📌 Filtres")
 
 # ----- CityPair -----
 city_options = sorted(df["[LIDO] Citypair"].dropna().unique().tolist())
+city_options = df.loc[df["Area"] == selected_area, "[LIDO] Citypair"]
 
 if "selected_cities" not in st.session_state:
     st.session_state.selected_cities = []
