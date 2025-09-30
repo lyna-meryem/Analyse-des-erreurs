@@ -251,21 +251,31 @@ if len(df_filtered) > 0:
 
 
 # Mapping automatique Delta -> LIDO
-lido_col = selected_delta_col.replace("Delta", "LIDO")
-if lido_col not in df_filtered.columns:
-    st.error(f"⚠️ Impossible de trouver la colonne LIDO associée à {selected_delta_col}")
-else:
+# Exemple de correspondances Delta -> LIDO
+mapping = {
+    "Delta Total cost (en $)": "[LIDO] New total cost (en $)",
+    "Delta Fuel cost (en $)": "[LIDO] New Fuel Cost (en $)",
+    "Delta Time related cost (en $)": "[LIDO] Time related costs (en $)",
+    "Delta ATC charges (en $)": "[LIDO] ATC charges (en $))"
+}
+
+# Vérifier si la colonne sélectionnée a un équivalent LIDO
+if selected_delta_col in mapping:
+    lido_col = mapping[selected_delta_col]
     df_filtered[lido_col] = pd.to_numeric(df_filtered[lido_col], errors="coerce")
 
-
-if lido_col in df_filtered.columns:
+    # Moyenne LIDO
     mean_lido = df_filtered[lido_col].mean()
 
+    # Pourcentages relatifs
+    mean_pct = (mean_observed / mean_lido) * 100
     ci_low_pct = (ci_low / mean_lido) * 100
     ci_high_pct = (ci_high / mean_lido) * 100
-    mean_pct = (mean_observed / mean_lido) * 100
 
     st.subheader("📊 Intervalle de confiance relatif (%)")
-    st.write(f"Moyenne LIDO : **{mean_lido:.2f}**")
-    st.write(f"Gain moyen (Delta) relatif : **{mean_pct:.2f}%**")
+    st.write(f"Moyenne {lido_col} : **{mean_lido:.2f}**")
+    st.write(f"Gain moyen relatif (Delta vs LIDO) : **{mean_pct:.2f}%**")
     st.write(f"IC95% relatif : **[{ci_low_pct:.2f}%, {ci_high_pct:.2f}%]**")
+else:
+    st.error(f"⚠️ Pas de colonne LIDO associée à {selected_delta_col}")
+
