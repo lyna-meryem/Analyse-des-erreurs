@@ -194,7 +194,6 @@ selected_area = st.sidebar.multiselect(
 )
 
 
-city_options = df.loc[df["Area"] == selected_area, "[LIDO] Citypair"]
 # ---------------------------
 # 4. Filtrage des données
 # ---------------------------
