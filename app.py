@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 from scipy import stats
 
 
@@ -306,7 +307,7 @@ strata_col = st.selectbox(
 def stratified_estimation(df, strata_col, value_col, N_dict, z=1.96):
     results = []
     for h, group in df.groupby(strata_col):
-        nh = len(group)                       # échantillon
+        nh = random.randint(1, Nh - 1)                      # échantillon
         Nh = N_dict.get(h, nh)                # population réelle (à fournir si connue)
         xh_bar = group[value_col].mean()      # moyenne observée
         sh = group[value_col].std(ddof=1)     # écart-type
