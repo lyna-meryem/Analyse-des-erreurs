@@ -111,9 +111,13 @@ selected_delta_col = st.selectbox("Choisir la colonne Delta à analyser", delta_
 
 # S’assurer que la colonne choisie est bien numérique
 df[selected_delta_col] = pd.to_numeric(df[selected_delta_col], errors="coerce")
-# Type “brut” de la colonne dan
-st.write("Dtype de la colonne :", df[selected_delta_col].dtype)
 
+# ---------------------------
+# Conversion en kg si nécessaire
+# ---------------------------
+if "en T" in selected_delta_col:   # Si le nom de la colonne contient "T"
+    st.info(f"⚖️ Conversion automatique de {selected_delta_col} en kilogrammes (kg)")
+    df[selected_delta_col] = df[selected_delta_col] * 1000
 
 # ---------------------------
 
@@ -211,7 +215,6 @@ st.write(f"📊 Nombre de vols filtrés : **{len(df_filtered)}**")
 # 5. Bootstrap et IC95%
 # ---------------------------
 df_filtered = df_filtered.dropna(subset=[selected_delta_col])
-st.write("DataFrame filtré :", df_filtered)
 
 if len(df_filtered) > 0:
     NBOOT = 5000
