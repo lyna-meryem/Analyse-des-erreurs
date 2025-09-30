@@ -115,14 +115,11 @@ df[selected_delta_col] = pd.to_numeric(df[selected_delta_col], errors="coerce")
 # ---------------------------
 # Conversion en kg si nécessaire
 # ---------------------------
-if "en T" in selected_delta_col:   # Si le nom de la colonne contient "T"
-    st.info(f"⚖️ Conversion automatique de {selected_delta_col} en kilogrammes (kg)")
-    df[selected_delta_col] = df[selected_delta_col] * 1000
+
 
 # ---------------------------
 
-# S’assurer que la colonne choisie est bien numérique
-df[selected_delta_col] = pd.to_numeric(df[selected_delta_col], errors="coerce")
+
 
 # ---------------------------
 # 3. Filtres (dans la sidebar à droite)
@@ -288,18 +285,3 @@ else:
     st.error("⚠️ Impossible de trouver la colonne LIDO correspondante.")
     
     
-col_index = df_filtered.columns.get_loc(selected_delta_col)
-lido_col = df_filtered.columns[col_index - 1]
-df_filtered[lido_col] = df_filtered[lido_col].astype(str).str.replace('[\$,]', '', regex=True)
-df_filtered[lido_col] = pd.to_numeric(df_filtered[lido_col], errors='coerce')
-
-st.write("Nombre de valeurs valides :", df_filtered[lido_col].notna().sum())
-
-st.write("Nombre de vols filtrés :", len(df_filtered))
-
-
-
-st.write("Colonne LIDO récupérée :", lido_col)
-st.write("Premières lignes :", df_filtered[[lido_col, selected_delta_col]].head())
-
-
