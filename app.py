@@ -11,27 +11,26 @@ df = pd.read_csv("vols.csv", parse_dates=["[FK] Flight date"])
 # ---------------------------
 # 2. Sélection de la colonne Delta
 # ---------------------------
+# On liste toutes les colonnes qui contiennent "Delta"
 delta_columns = [col for col in df.columns if "Delta" in col]
 selected_delta_col = st.selectbox("Choisir la colonne Delta à analyser", delta_columns)
 
-# S’assurer que la colonne est numérique
+# S’assurer que la colonne choisie est bien numérique
 df[selected_delta_col] = pd.to_numeric(df[selected_delta_col], errors="coerce")
 
 # ---------------------------
-# 3. Filtres Streamlit
+# 3. Filtres (dans la sidebar à droite)
 # ---------------------------
+st.sidebar.header("📌 Filtres")
 
-# ----- CityPair -----
 # ----- CityPair -----
 city_options = sorted(df["[LIDO] Citypair"].dropna().unique().tolist())
 
 if "selected_cities" not in st.session_state:
     st.session_state.selected_cities = []
 
-# Champ recherche
-search_city = st.text_input("🔎 Rechercher un CityPair")
+search_city = st.sidebar.text_input("🔎 Rechercher un CityPair")
 
-# Filtrer les options en fonction de la recherche
 if search_city:
     filtered_city_options = [c for c in city_options if search_city.lower() in c.lower()]
 else:
@@ -40,14 +39,13 @@ else:
 def select_all_cities():
     st.session_state.selected_cities = filtered_city_options
 
-st.button("Sélectionner tous les CityPairs affichés", on_click=select_all_cities)
+st.sidebar.button("Sélectionner tous les CityPairs affichés", on_click=select_all_cities)
 
-selected_cities = st.multiselect(
+selected_cities = st.sidebar.multiselect(
     "CityPair",
     options=filtered_city_options,
     default=st.session_state.selected_cities
 )
-
 
 # ----- Type Avion -----
 type_options = df["Type Avions IATA"].dropna().unique().tolist()
@@ -57,19 +55,26 @@ if "selected_types" not in st.session_state:
 def select_all_types():
     st.session_state.selected_types = type_options
 
-st.button("Sélectionner tous les Types Avions", on_click=select_all_types)
+st.sidebar.button("Sélectionner tous les Types Avions", on_click=select_all_types)
 
-selected_types = st.multiselect(
+selected_types = st.sidebar.multiselect(
     "Type Avions IATA",
     options=type_options,
     default=st.session_state.selected_types
 )
 
-# ----- Dates -----
-date_range = st.date_input(
+# ----- Dates avec un slider -----
+min_date = df["[FK] Flight date"].min()
+max_date = df["[FK] Flight date"].max()
+
+date_range = st.sidebar.slider(
     "Sélectionner la période",
-    [df["[FK] Flight date"].min(), df["[FK] Flight date"].max()]
+    min_value=min_date.to_pydatetime(),
+    max_value=max_date.to_pydatetime(),
+    value=(min_date.to_pydatetime(), max_date.to_pydatetime()),
+    format="DD/MM/YYYY"
 )
+
 start_date = pd.to_datetime(date_range[0])
 end_date = pd.to_datetime(date_range[1])
 
@@ -81,9 +86,9 @@ if "selected_area" not in st.session_state:
 def select_all_area():
     st.session_state.selected_area = area_options
 
-st.button("Sélectionner tous les secteurs", on_click=select_all_area)
+st.sidebar.button("Sélectionner tous les secteurs", on_click=select_all_area)
 
-selected_area = st.multiselect(
+selected_area = st.sidebar.multiselect(
     "Area",
     options=area_options,
     default=st.session_state.selected_area
@@ -99,7 +104,7 @@ df_filtered = df[
     (df["[FK] Flight date"].between(start_date, end_date))
 ]
 
-st.write(f"Nombre de vols filtrés : {len(df_filtered)}")
+st.write(f"📊 Nombre de vols filtrés : **{len(df_filtered)}**")
 
 # ---------------------------
 # 5. Bootstrap et IC95%
@@ -147,7 +152,6 @@ if len(df_filtered) > 0:
         (df_filtered[selected_delta_col] > Q3 + 1.5 * IQR)
     ]
 
+    st.subheader("📌 Analyse des Outliers")
     st.write("Vols outliers (méthode 3σ) :", outliers_sigma)
     st.write("Vols outliers (méthode IQR) :", outliers_iqr)
-
-
