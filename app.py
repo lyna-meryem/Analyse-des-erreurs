@@ -102,10 +102,24 @@ df = pd.read_csv("vols.csv", parse_dates=["[FK] Flight date"])
 
 # ---------------------------
 # 2. Sélection de la colonne Delta
+
 # ---------------------------
-# On liste toutes les colonnes qui contiennent "Delta"
+# 2. Sélection de la colonne Delta
+# ---------------------------
 delta_columns = [col for col in df.columns if "Delta" in col]
 selected_delta_col = st.selectbox("Choisir la colonne Delta à analyser", delta_columns)
+
+# S’assurer que la colonne choisie est bien numérique
+df[selected_delta_col] = pd.to_numeric(df[selected_delta_col], errors="coerce")
+
+# ---------------------------
+# Conversion en kg si nécessaire
+# ---------------------------
+if "T" in selected_delta_col:   # Si le nom de la colonne contient "T"
+    st.info(f"⚖️ Conversion automatique de {selected_delta_col} en kilogrammes (kg)")
+    df[selected_delta_col] = df[selected_delta_col] * 1000
+
+# ---------------------------
 
 # S’assurer que la colonne choisie est bien numérique
 df[selected_delta_col] = pd.to_numeric(df[selected_delta_col], errors="coerce")
