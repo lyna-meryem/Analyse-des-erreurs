@@ -286,3 +286,10 @@ if col_index > 0:
     st.write(f"IC95% relatif : **[{ci_low_pct:.2f}%, {ci_high_pct:.2f}%]**")
 else:
     st.error("⚠️ Impossible de trouver la colonne LIDO correspondante.")
+    
+    
+col_index = df_filtered.columns.get_loc(selected_delta_col)
+lido_col = df_filtered.columns[col_index - 1]
+
+st.write("Colonne LIDO récupérée :", lido_col)
+st.write("Premières lignes :", df_filtered[[lido_col, selected_delta_col]].head())
