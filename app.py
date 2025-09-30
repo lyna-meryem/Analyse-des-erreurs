@@ -14,11 +14,12 @@ st.write("Formule générale :")
 st.latex(r"IC = \bar{x} \pm z_{\alpha/2} \cdot \frac{s}{\sqrt{n}}")
 
 st.markdown("""
-- \( \bar{x} \) = moyenne de l’échantillon  
-- \( s \) = écart-type  
-- \( n \) = taille de l’échantillon  
-- \( z_{\alpha/2} \) ≈ 1.96 pour 95% de confiance
+- \\( \\bar{x} \\) = moyenne de l’échantillon  
+- \\( s \\) = écart-type  
+- \\( n \\) = taille de l’échantillon  
+- \\( z_{\\alpha/2} \\) ≈ 1.96 pour 95% de confiance
 """)
+
 
 # Données
 data = np.random.randn(100) * 5 + 50
