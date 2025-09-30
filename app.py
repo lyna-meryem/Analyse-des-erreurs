@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import random
 from scipy import stats
 
-
 # ---------------------------
 # 1. Charger les données
 # ---------------------------
