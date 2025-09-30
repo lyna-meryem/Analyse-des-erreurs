@@ -92,6 +92,11 @@ df = pd.read_csv("vols.csv", parse_dates=["[FK] Flight date"])
 delta_columns = [col for col in df.columns if "Delta" in col]
 selected_delta_col = st.selectbox("Choisir la colonne Delta à analyser", delta_columns)
 
+df[selected_delta_col] = (
+    df[selected_delta_col]
+    .astype(str)                # transformer en texte pour le nettoyage
+    .str.replace(",", ".", regex=False)  # remplacer virgule par point
+)
 # S’assurer que la colonne choisie est bien numérique
 df[selected_delta_col] = pd.to_numeric(df[selected_delta_col], errors="coerce")
 
