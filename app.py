@@ -115,7 +115,7 @@ df[selected_delta_col] = pd.to_numeric(df[selected_delta_col], errors="coerce")
 # ---------------------------
 # Conversion en kg si nécessaire
 # ---------------------------
-if "T" in selected_delta_col:   # Si le nom de la colonne contient "T"
+if "en T" in selected_delta_col:   # Si le nom de la colonne contient "T"
     st.info(f"⚖️ Conversion automatique de {selected_delta_col} en kilogrammes (kg)")
     df[selected_delta_col] = df[selected_delta_col] * 1000
 
