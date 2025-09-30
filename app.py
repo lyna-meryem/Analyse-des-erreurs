@@ -304,24 +304,30 @@ strata_col = st.selectbox(
 
 import random
 
+# Nh : population réelle par strate (doit être fourni)
+N_dict = {
+    h: len(df_filtered[df_filtered[strata_col] == h]) * 2  # juste un exemple, Nh > nh
+    for h in df_filtered[strata_col].unique()
+}
+
 # Estimation stratifiée avec nh aléatoire
 def stratified_estimation(df, strata_col, value_col, N_dict, z=1.96):
+    if df.empty:
+        st.warning("⚠️ Aucune donnée disponible pour la stratification.")
+        return None, None, None, None
+
     results = []
     for h, group in df.groupby(strata_col):
-        # nh aléatoire entre 50 et 500
-        nh = random.randint(50, min(500, len(group)))  # pas plus que le nombre de lignes si <500
-        
+        max_nh = len(group)
+        nh = random.randint(50, max(max_nh, 50))  # nh aléatoire entre 50 et max disponible
         Nh = N_dict.get(h)
-        if Nh is None:
-            st.warning(f"Nh manquant pour la strate {h}. Cette strate sera ignorée.")
+        if Nh is None or Nh <= nh:
+            st.warning(f"Nh non défini ou trop petit pour la strate {h}, on ignore cette strate.")
             continue
 
         xh_bar = group[value_col].mean()
         sh = group[value_col].std(ddof=1)
-
         Th = Nh * xh_bar
-
-        # Variance avec correction population finie
         var_Th = (Nh**2 * sh**2 / nh) * ((Nh - nh) / Nh) if nh > 1 else 0
 
         results.append({
@@ -333,6 +339,10 @@ def stratified_estimation(df, strata_col, value_col, N_dict, z=1.96):
             "Variance(Th)": var_Th
         })
 
+    if not results:
+        st.warning("⚠️ Aucune strate valide à afficher.")
+        return None, None, None, None
+
     res_df = pd.DataFrame(results)
     T_hat = res_df["Total estimé (Th)"].sum()
     Var_T = res_df["Variance(Th)"].sum()
@@ -341,3 +351,15 @@ def stratified_estimation(df, strata_col, value_col, N_dict, z=1.96):
     IC_low, IC_high = T_hat - ME, T_hat + ME
 
     return res_df, T_hat, Var_T, (IC_low, IC_high)
+
+
+# Appel de la fonction
+selected_delta_col = st.selectbox("Choisir la colonne à analyser", df_filtered.columns)
+res_df, T_hat, Var_T, IC = stratified_estimation(df_filtered, strata_col, selected_delta_col, N_dict)
+
+if res_df is not None:
+    st.subheader("Résultats par strate")
+    st.dataframe(res_df)
+    st.write(f"**Total estimé** : {T_hat:.2f}")
+    st.write(f"**Variance totale** : {Var_T:.2f}")
+    st.write(f"**IC95% du total** : [{IC[0]:.2f}, {IC[1]:.2f}]")
