@@ -82,7 +82,7 @@ def select_all_types():
 st.sidebar.button("Sélectionner tous les Types Avions", on_click=select_all_types)
 
 selected_types = st.sidebar.multiselect(
-    "Type Avions IATA",git pull origin main --rebase
+    "Type Avions IATA",
 
     options=type_options,
     default=st.session_state.selected_types
