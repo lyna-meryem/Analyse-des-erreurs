@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-from scipy import stats
 
-# ---------------------------
+
+
 # 1. Charger les données
 # ---------------------------
 df = pd.read_csv("vols.csv", parse_dates=["[FK] Flight date"])
@@ -82,7 +82,8 @@ def select_all_types():
 st.sidebar.button("Sélectionner tous les Types Avions", on_click=select_all_types)
 
 selected_types = st.sidebar.multiselect(
-    "Type Avions IATA",
+    "Type Avions IATA",git pull origin main --rebase
+
     options=type_options,
     default=st.session_state.selected_types
 )
