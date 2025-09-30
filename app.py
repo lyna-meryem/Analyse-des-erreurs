@@ -2,6 +2,112 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import stats
+
+
+st.title("Méthodes Statistiques d'Analyse des Données")
+
+# ===== 1. Intervalle de Confiance =====
+st.header("1. Intervalle de Confiance (IC)")
+st.markdown(r"""
+L’**intervalle de confiance** permet d’estimer la plage dans laquelle se situe la moyenne réelle d’une population.  
+
+Formule :  
+
+\[
+IC = \bar{x} \pm z_{\alpha/2} \cdot \frac{s}{\sqrt{n}}
+\]
+
+- \( \bar{x} \) = moyenne de l’échantillon  
+- \( s \) = écart-type  
+- \( n \) = taille de l’échantillon  
+- \( z_{\alpha/2} \) ≈ 1.96 pour 95% de confiance
+""")
+
+# Données
+data = np.random.randn(100) * 5 + 50
+mean = np.mean(data)
+std_err = stats.sem(data)
+conf = 0.95
+h = std_err * stats.t.ppf((1+conf)/2, len(data)-1)
+ci_low, ci_high = mean - h, mean + h
+
+st.write(f"Moyenne : **{mean:.2f}**")
+st.write(f"IC à 95% : **[{ci_low:.2f}, {ci_high:.2f}]**")
+
+# ===== 2. Méthode des 3 Sigma =====
+st.header("2. Méthode des 3 Sigma")
+st.markdown(r"""
+Cette méthode identifie les **valeurs aberrantes** situées en dehors de :  
+
+\[
+[\mu - 3\sigma , \mu + 3\sigma]
+\]
+
+- \( \mu \) = moyenne  
+- \( \sigma \) = écart-type  
+
+👉 En théorie, 99,7% des données d’une loi normale se trouvent dans cet intervalle.
+""")
+
+mu, sigma = np.mean(data), np.std(data)
+borne_basse, borne_haute = mu - 3*sigma, mu + 3*sigma
+outliers_sigma = [x for x in data if x < borne_basse or x > borne_haute]
+
+st.write(f"Bornes : **[{borne_basse:.2f}, {borne_haute:.2f}]**")
+st.write(f"Valeurs aberrantes détectées (3σ) : {len(outliers_sigma)}")
+
+# ===== 3. Méthode de l’IQR =====
+st.header("3. Méthode de l’IQR (Interquartile Range)")
+st.markdown(r"""
+L’**IQR (écart interquartile)** mesure la dispersion des données entre le 1er quartile (Q1) et le 3ème quartile (Q3).  
+
+On considère comme **outliers** les points en dehors de :  
+
+\[
+[Q1 - 1.5 \cdot IQR , Q3 + 1.5 \cdot IQR]
+\]
+""")
+
+Q1, Q3 = np.percentile(data, [25, 75])
+IQR = Q3 - Q1
+borne_basse_iqr, borne_haute_iqr = Q1 - 1.5*IQR, Q3 + 1.5*IQR
+outliers_iqr = [x for x in data if x < borne_basse_iqr or x > borne_haute_iqr]
+
+st.write(f"Q1 = {Q1:.2f}, Q3 = {Q3:.2f}, IQR = {IQR:.2f}")
+st.write(f"Bornes : **[{borne_basse_iqr:.2f}, {borne_haute_iqr:.2f}]**")
+st.write(f"Valeurs aberrantes détectées (IQR) : {len(outliers_iqr)}")
+
+# ===== Graphique =====
+st.header("Visualisation des méthodes")
+fig, ax = plt.subplots()
+ax.boxplot(data, vert=False)
+ax.set_title("Boxplot avec IQR")
+st.pyplot(fig)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # ---------------------------
 # 1. Charger les données
