@@ -7,17 +7,13 @@ from scipy import stats
 
 st.title("Méthodes Statistiques d'Analyse des Données")
 
-# ===== 1. Intervalle de Confiance =====
-st.header("1. Intervalle de Confiance (IC)")
-st.markdown(r"""
-L’**intervalle de confiance** permet d’estimer la plage dans laquelle se situe la moyenne réelle d’une population.  
+t.header("1. Intervalle de Confiance (IC)")
+st.write("L’**intervalle de confiance** permet d’estimer la plage dans laquelle se situe la moyenne réelle d’une population.")
 
-Formule :  
+st.write("Formule générale :")
+st.latex(r"IC = \bar{x} \pm z_{\alpha/2} \cdot \frac{s}{\sqrt{n}}")
 
-\[
-IC = \bar{x} \pm z_{\alpha/2} \cdot \frac{s}{\sqrt{n}}
-\]
-
+st.markdown("""
 - \( \bar{x} \) = moyenne de l’échantillon  
 - \( s \) = écart-type  
 - \( n \) = taille de l’échantillon  
