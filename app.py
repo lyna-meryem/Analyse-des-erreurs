@@ -61,10 +61,9 @@ st.markdown(r"""
 L’**IQR (écart interquartile)** mesure la dispersion des données entre le 1er quartile (Q1) et le 3ème quartile (Q3).  
 
 On considère comme **outliers** les points en dehors de :  
-
-\[
+""")
+st.latex(r"""
 [Q1 - 1.5 \cdot IQR , Q3 + 1.5 \cdot IQR]
-\]
 """)
 
 Q1, Q3 = np.percentile(data, [25, 75])
@@ -75,22 +74,6 @@ outliers_iqr = [x for x in data if x < borne_basse_iqr or x > borne_haute_iqr]
 st.write(f"Q1 = {Q1:.2f}, Q3 = {Q3:.2f}, IQR = {IQR:.2f}")
 st.write(f"Bornes : **[{borne_basse_iqr:.2f}, {borne_haute_iqr:.2f}]**")
 st.write(f"Valeurs aberrantes détectées (IQR) : {len(outliers_iqr)}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
