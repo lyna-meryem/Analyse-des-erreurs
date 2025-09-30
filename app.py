@@ -247,3 +247,25 @@ if len(df_filtered) > 0:
     st.subheader("📌 Analyse des Outliers")
     st.write("Vols outliers (méthode 3σ) :", outliers_sigma)
     st.write("Vols outliers (méthode IQR) :", outliers_iqr)
+
+
+
+# Mapping automatique Delta -> LIDO
+lido_col = selected_delta_col.replace("Delta", "LIDO")
+if lido_col not in df_filtered.columns:
+    st.error(f"⚠️ Impossible de trouver la colonne LIDO associée à {selected_delta_col}")
+else:
+    df_filtered[lido_col] = pd.to_numeric(df_filtered[lido_col], errors="coerce")
+
+
+if lido_col in df_filtered.columns:
+    mean_lido = df_filtered[lido_col].mean()
+
+    ci_low_pct = (ci_low / mean_lido) * 100
+    ci_high_pct = (ci_high / mean_lido) * 100
+    mean_pct = (mean_observed / mean_lido) * 100
+
+    st.subheader("📊 Intervalle de confiance relatif (%)")
+    st.write(f"Moyenne LIDO : **{mean_lido:.2f}**")
+    st.write(f"Gain moyen (Delta) relatif : **{mean_pct:.2f}%**")
+    st.write(f"IC95% relatif : **[{ci_low_pct:.2f}%, {ci_high_pct:.2f}%]**")
