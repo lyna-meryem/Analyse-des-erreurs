@@ -13,12 +13,11 @@ st.write("L’**intervalle de confiance** permet d’estimer la plage dans laque
 st.write("Formule générale :")
 st.latex(r"IC = \bar{x} \pm z_{\alpha/2} \cdot \frac{s}{\sqrt{n}}")
 
-st.markdown("""
-- \\( \\bar{x} \\) = moyenne de l’échantillon  
-- \\( s \\) = écart-type  
-- \\( n \\) = taille de l’échantillon  
-- \\( z_{\\alpha/2} \\) ≈ 1.96 pour 95% de confiance
-""")
+st.write("Avec :")
+st.latex(r"x_i = \text{chaque valeur de l’échantillon}")
+st.latex(r"\overline{x} = \text{moyenne de l’échantillon}")
+st.latex(r"n = \text{taille de l’échantillon}")
+st.latex(r"s = \text{écart-type de l’échantillon}")
 
 
 # Données
@@ -40,11 +39,12 @@ Cette méthode identifie les **valeurs aberrantes** situées en dehors de :
 
 st.latex(r"[\mu - 3\sigma , \mu + 3\sigma]")
 
-st.markdown("""
-- \\( \mu \\) = moyenne  
-- \\( \sigma \\) = écart-type  
+st.write("Avec :")
+st.latex(r"\mu = \text{moyenne}")
+st.latex(r"\sigma = \text{écart-type}")
 
-👉 En théorie, 99,7% des données d’une loi normale se trouvent dans cet intervalle.
+st.markdown("""
+👉 En théorie, **99,7%** des données d’une loi normale se trouvent dans cet intervalle.
 """)
 
 
