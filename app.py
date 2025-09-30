@@ -33,18 +33,19 @@ st.write(f"IC à 95% : **[{ci_low:.2f}, {ci_high:.2f}]**")
 
 # ===== 2. Méthode des 3 Sigma =====
 st.header("2. Méthode des 3 Sigma")
-st.markdown(r"""
-Cette méthode identifie les **valeurs aberrantes** situées en dehors de :  
+st.markdown("""
+Cette méthode identifie les **valeurs aberrantes** situées en dehors de :
+""")
 
-\[
-[\mu - 3\sigma , \mu + 3\sigma]
-\]
+st.latex(r"[\mu - 3\sigma , \mu + 3\sigma]")
 
-- \( \mu \) = moyenne  
-- \( \sigma \) = écart-type  
+st.markdown("""
+- \\( \mu \\) = moyenne  
+- \\( \sigma \\) = écart-type  
 
 👉 En théorie, 99,7% des données d’une loi normale se trouvent dans cet intervalle.
 """)
+
 
 mu, sigma = np.mean(data), np.std(data)
 borne_basse, borne_haute = mu - 3*sigma, mu + 3*sigma
