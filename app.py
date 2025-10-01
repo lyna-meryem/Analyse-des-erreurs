@@ -8,7 +8,10 @@ from scipy import stats
 st.title("Méthodes Statistiques d'Analyse des Données")
 
 st.header("1. Intervalle de Confiance (IC)")
-st.write("La notion d'intervalle de confiance renvoie au degré de précision d’une moyenne ou d’un pourcentage.Elle s’appuie sur un échantillon et vise à estimer la fiabilité que l’on peut accorder aux valeurs observées par rapport aux valeurs réelles de la population totale.")
+st.write("La notion d'intervalle de confiance renvoie au degré de précision d’une moyenne ou d’un pourcentage. "
+         "Elle s’appuie sur un échantillon et vise à estimer la fiabilité que l’on peut accorder aux valeurs observées "
+         "par rapport aux valeurs réelles de la population totale.")
+
 
 st.write("Formule générale :")
 st.latex(r"IC = \bar{x} \pm z_{\alpha/2} \cdot \frac{s}{\sqrt{n}}")
