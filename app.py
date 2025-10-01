@@ -161,6 +161,7 @@ if len(df_filtered) > 0:
     ci_low, ci_high = np.percentile(boot_means, [2.5, 97.5])
     mean_observed = df_filtered[selected_delta_col].mean()
 
+    # --- Plot distribution bootstrap ---
     fig, ax = plt.subplots(figsize=(8, 4))
     ax.hist(boot_means, bins=30, color="skyblue", edgecolor="black")
     ax.axvline(ci_low, color="red", linestyle="--", label=f"IC 2.5% = {ci_low:.2f}")
@@ -171,13 +172,10 @@ if len(df_filtered) > 0:
     ax.set_ylabel("Fréquence")
     ax.legend()
     st.pyplot(fig)
-else:
-    st.warning("⚠️ Aucun vol valide trouvé pour la colonne sélectionnée")
 
-# ---------------------------
-# 6. Analyse des outliers
-# ---------------------------
-if len(df_filtered) > 0:
+    # ---------------------------
+    # 6. Analyse des outliers
+    # ---------------------------
     mean_delta = df_filtered[selected_delta_col].mean()
     std_delta = df_filtered[selected_delta_col].std()
 
@@ -197,39 +195,27 @@ if len(df_filtered) > 0:
     st.write("Vols outliers (méthode 3σ) :", outliers_sigma)
     st.write("Vols outliers (méthode IQR) :", outliers_iqr)
 
+    # ---------------------------
+    # IC relatif par rapport à LIDO
+    # ---------------------------
+    col_index = df_filtered.columns.get_loc(selected_delta_col)
+    if col_index > 0:
+        lido_col = df_filtered.columns[col_index - 1]
+        df_filtered[lido_col] = pd.to_numeric(df_filtered[lido_col], errors="coerce")
 
+        mean_lido = df_filtered[lido_col].mean()
+        if mean_lido and not np.isnan(mean_lido) and mean_lido != 0:
+            mean_pct = (mean_observed / mean_lido) * 100
+            ci_low_pct = (ci_low / mean_lido) * 100
+            ci_high_pct = (ci_high / mean_lido) * 100
 
-# Trouver la colonne LIDO qui précède la colonne Delta choisie
-col_index = df_filtered.columns.get_loc(selected_delta_col)
-mean_observed = df_filtered[selected_delta_col].mean()
-
-if col_index > 0:
-    lido_col = df_filtered.columns[col_index - 1]  # juste avant
-    df_filtered[lido_col] = pd.to_numeric(df_filtered[lido_col], errors="coerce")
-
-    # Moyenne LIDO
-    mean_lido = df_filtered[lido_col].mean()
-
-    # Pourcentages relatifs
-    mean_pct = (mean_observed / mean_lido) * 100
-    ci_low_pct = (ci_low / mean_lido) * 100
-    ci_high_pct = (ci_high / mean_lido) * 100
-
-    st.subheader("📊 Intervalle de confiance relatif (%)")
-    st.write(f"Moyenne {lido_col} : **{mean_lido:.2f}**")
-    st.write(f"Gain moyen relatif (Delta vs LIDO) : **{mean_pct:.2f}%**")
-    st.write(f"IC95% relatif : **[{ci_low_pct:.2f}%, {ci_high_pct:.2f}%]**")
+            st.subheader("📊 Intervalle de confiance relatif (%)")
+            st.write(f"Moyenne {lido_col} : **{mean_lido:.2f}**")
+            st.write(f"Gain moyen relatif (Delta vs LIDO) : **{mean_pct:.2f}%**")
+            st.write(f"IC95% relatif : **[{ci_low_pct:.2f}%, {ci_high_pct:.2f}%]**")
+        else:
+            st.warning("⚠️ Impossible de calculer le pourcentage relatif (moyenne LIDO invalide).")
+    else:
+        st.error("⚠️ Impossible de trouver la colonne LIDO correspondante.")
 else:
-    st.error("⚠️ Impossible de trouver la colonne LIDO correspondante.")
-    
-    
-col_index = df_filtered.columns.get_loc(selected_delta_col)
-lido_col = df_filtered.columns[col_index - 1]
-df_filtered[lido_col] = df_filtered[lido_col].astype(str).str.replace('[\$,]', '', regex=True)
-df_filtered[lido_col] = pd.to_numeric(df_filtered[lido_col], errors='coerce')
-
-
-st.write("Colonne LIDO récupérée :", lido_col)
-st.write("Premières lignes :", df_filtered[[lido_col, selected_delta_col]].head())
-
-
+    st.warning("⚠️ Aucun vol valide trouvé pour la colonne sélectionnée")
