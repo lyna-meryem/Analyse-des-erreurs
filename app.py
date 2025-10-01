@@ -8,7 +8,7 @@ from scipy import stats
 st.title("Méthodes Statistiques d'Analyse des Données")
 
 st.header("1. Intervalle de Confiance (IC)")
-st.write("L’**intervalle de confiance** permet d’estimer la plage dans laquelle se situe la moyenne réelle d’une population.")
+st.write("La notion d'intervalle de confiance renvoie au degré de précision d’une moyenne ou d’un pourcentage.Elle s’appuie sur un échantillon et vise à estimer la fiabilité que l’on peut accorder aux valeurs observées par rapport aux valeurs réelles de la population totale.")
 
 st.write("Formule générale :")
 st.latex(r"IC = \bar{x} \pm z_{\alpha/2} \cdot \frac{s}{\sqrt{n}}")
@@ -18,65 +18,6 @@ st.latex(r"\overline{x} = \text{moyenne de l’échantillon}")
 st.latex(r"s = \text{écart-type}")
 st.latex(r"n = \text{taille de l’échantillon}")
 st.latex(r"z_{\alpha/2} \approx 1.96 \text{ pour un IC à 95\%}")
-
-
-# Données
-data = np.random.randn(100) * 5 + 50
-mean = np.mean(data)
-std_err = stats.sem(data)
-conf = 0.95
-h = std_err * stats.t.ppf((1+conf)/2, len(data)-1)
-ci_low, ci_high = mean - h, mean + h
-
-st.write(f"Moyenne : **{mean:.2f}**")
-st.write(f"IC à 95% : **[{ci_low:.2f}, {ci_high:.2f}]**")
-
-# ===== 2. Méthode des 3 Sigma =====
-st.header("2. Méthode des 3 Sigma")
-st.markdown("""
-Cette méthode identifie les **valeurs aberrantes** situées en dehors de :
-""")
-
-st.latex(r"[\mu - 3\sigma , \mu + 3\sigma]")
-
-st.write("Avec :")
-st.latex(r"\mu = \text{moyenne}")
-st.latex(r"\sigma = \text{écart-type}")
-
-st.markdown("""
-👉 En théorie, **99,7%** des données d’une loi normale se trouvent dans cet intervalle.
-""")
-
-
-mu, sigma = np.mean(data), np.std(data)
-borne_basse, borne_haute = mu - 3*sigma, mu + 3*sigma
-outliers_sigma = [x for x in data if x < borne_basse or x > borne_haute]
-
-st.write(f"Bornes : **[{borne_basse:.2f}, {borne_haute:.2f}]**")
-st.write(f"Valeurs aberrantes détectées (3σ) : {len(outliers_sigma)}")
-
-# ===== 3. Méthode de l’IQR =====
-st.header("3. Méthode de l’IQR (Interquartile Range)")
-st.markdown(r"""
-L’**IQR (écart interquartile)** mesure la dispersion des données entre le 1er quartile (Q1) et le 3ème quartile (Q3).  
-
-On considère comme **outliers** les points en dehors de :  
-""")
-st.latex(r"""
-[Q1 - 1.5 \cdot IQR , Q3 + 1.5 \cdot IQR]
-""")
-
-Q1, Q3 = np.percentile(data, [25, 75])
-IQR = Q3 - Q1
-borne_basse_iqr, borne_haute_iqr = Q1 - 1.5*IQR, Q3 + 1.5*IQR
-outliers_iqr = [x for x in data if x < borne_basse_iqr or x > borne_haute_iqr]
-
-st.write(f"Q1 = {Q1:.2f}, Q3 = {Q3:.2f}, IQR = {IQR:.2f}")
-st.write(f"Bornes : **[{borne_basse_iqr:.2f}, {borne_haute_iqr:.2f}]**")
-st.write(f"Valeurs aberrantes détectées (IQR) : {len(outliers_iqr)}")
-
-
-
 
 # ---------------------------
 # 1. Charger les données
