@@ -176,6 +176,37 @@ if len(df_filtered) > 0:
     ax.legend()
     st.pyplot(fig)
 
+st.subheader("📈 Distribution des valeurs")
+
+# Liste des colonnes numériques disponibles
+numeric_cols = df_filtered.select_dtypes(include=[np.number]).columns.tolist()
+
+if len(numeric_cols) > 0:
+    selected_dist_col = st.selectbox("Choisir une variable à visualiser", numeric_cols, index=0)
+
+    # Créer une figure
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.hist(df_filtered[selected_dist_col].dropna(), bins=30, color="skyblue", edgecolor="black", alpha=0.7)
+    ax.set_title(f"Distribution de {selected_dist_col}")
+    ax.set_xlabel(selected_dist_col)
+    ax.set_ylabel("Fréquence")
+
+    # Ajouter les statistiques principales
+    mean_val = df_filtered[selected_dist_col].mean()
+    median_val = df_filtered[selected_dist_col].median()
+    std_val = df_filtered[selected_dist_col].std()
+
+    ax.axvline(mean_val, color="red", linestyle="--", label=f"Moyenne = {mean_val:.2f}")
+    ax.axvline(median_val, color="green", linestyle=":", label=f"Médiane = {median_val:.2f}")
+    ax.legend()
+
+    st.pyplot(fig)
+
+    # Afficher résumé statistique
+    st.write("📊 **Résumé statistique :**")
+    st.write(df_filtered[selected_dist_col].describe().to_frame().T)
+else:
+    st.warning("⚠️ Aucune colonne numérique disponible pour afficher une distribution.")
 
 
 
