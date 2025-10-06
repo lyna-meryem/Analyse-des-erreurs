@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from scipy import stats
 
 
-st.title("Méthodes Statistiques d'Analyse des Données")
+st.title("Analyse des erreurs")
 
 st.header("1. Intervalle de Confiance (IC)")
 st.write("La notion d'intervalle de confiance renvoie au degré de précision d’une moyenne ou d’un pourcentage. "
@@ -13,14 +13,13 @@ st.write("La notion d'intervalle de confiance renvoie au degré de précision d�
          "par rapport aux valeurs réelles de la population totale.")
 
 
-st.write("Formule générale :")
-st.latex(r"IC = \bar{x} \pm z_{\alpha/2} \cdot \frac{s}{\sqrt{n}}")
-
-st.write("Avec :")
-st.latex(r"\overline{x} = \text{moyenne de l’échantillon}")
-st.latex(r"s = \text{écart-type}")
-st.latex(r"n = \text{taille de l’échantillon}")
-st.latex(r"z_{\alpha/2} \approx 1.96 \text{ pour un IC à 95\%}")
+# st.write("Formule générale :")
+# st.latex(r"IC = \bar{x} \pm z_{\alpha/2} \cdot \frac{s}{\sqrt{n}}")
+# st.write("Avec :")
+# st.latex(r"\overline{x} = \text{moyenne de l’échantillon}")
+# st.latex(r"s = \text{écart-type}")
+# st.latex(r"n = \text{taille de l’échantillon}")
+# st.latex(r"z_{\alpha/2} \approx 1.96 \text{ pour un IC à 95\%}")
 
 # ---------------------------
 # 1. Charger les données
@@ -159,7 +158,7 @@ st.header("2. Analyse de la Distribution de l'Échantillon")
 
 if len(df_filtered) > 0:
     # --- Sélection de la colonne à analyser ---
-    numeric_cols = df_filtered.select_dtypes(include=[np.number]).columns.tolist()
+    numeric_cols = selected_delta_col.select_dtypes(include=[np.number]).columns.tolist()
     selected_dist_col = st.selectbox("Choisir une variable numérique à analyser", numeric_cols, index=0)
 
     data = df_filtered[selected_dist_col].dropna()
