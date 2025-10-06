@@ -158,7 +158,7 @@ st.header("2. Analyse de la Distribution de l'Échantillon")
 
 if len(df_filtered) > 0:
     # --- Sélection de la colonne à analyser ---
-    numeric_cols = selected_delta_col.select_dtypes(include=[np.number]).columns.tolist()
+    numeric_cols = df_filtered[selected_delta_col].select_dtypes(include=[np.number]).columns.tolist()
     selected_dist_col = st.selectbox("Choisir une variable numérique à analyser", numeric_cols, index=0)
 
     data = df_filtered[selected_dist_col].dropna()
