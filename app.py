@@ -156,57 +156,60 @@ st.write(f"📊 Nombre de vols filtrés : **{len(df_filtered)}**")
 # ==========================
 st.header("2. Analyse de la Distribution de l'Échantillon")
 
-if len(df_filtered) > 0:
-    # --- Sélection de la colonne à analyser ---
-    numeric_cols = df_filtered[selected_delta_col].select_dtypes(include=[np.number]).columns.tolist()
-    selected_dist_col = st.selectbox("Choisir une variable numérique à analyser", numeric_cols, index=0)
+iif len(df_filtered) > 0:
+    # --- Vérification que la colonne est numérique ---
+    if np.issubdtype(df_filtered[selected_delta_col].dtype, np.number):
+        data = df_filtered[selected_delta_col].dropna()
 
-    data = df_filtered[selected_dist_col].dropna()
+        if len(data) > 1:
+            # --- Graphique : histogramme + densité ---
+            fig, ax = plt.subplots(figsize=(8, 4))
+            ax.hist(data, bins=30, color="skyblue", edgecolor="black", alpha=0.7, density=True)
 
-    # --- Graphique : histogramme + densité ---
-    fig, ax = plt.subplots(figsize=(8, 4))
-    ax.hist(data, bins=30, color="skyblue", edgecolor="black", alpha=0.7, density=True)
-    
-    # Courbe de densité
-    from scipy.stats import gaussian_kde
-    density = gaussian_kde(data)
-    x_vals = np.linspace(data.min(), data.max(), 200)
-    ax.plot(x_vals, density(x_vals), color="red", linewidth=2, label="Densité empirique")
+            # Courbe de densité empirique
+            from scipy.stats import gaussian_kde
+            density = gaussian_kde(data)
+            x_vals = np.linspace(data.min(), data.max(), 200)
+            ax.plot(x_vals, density(x_vals), color="red", linewidth=2, label="Densité empirique")
 
-    # Courbe normale théorique
-    from scipy.stats import norm
-    p = norm.pdf(x_vals, data.mean(), data.std())
-    ax.plot(x_vals, p, 'green', linestyle="--", label="Loi normale théorique")
+            # Courbe normale théorique
+            from scipy.stats import norm
+            p = norm.pdf(x_vals, data.mean(), data.std())
+            ax.plot(x_vals, p, 'green', linestyle="--", label="Loi normale théorique")
 
-    ax.set_title(f"Distribution de {selected_dist_col}")
-    ax.set_xlabel(selected_dist_col)
-    ax.set_ylabel("Densité")
-    ax.legend()
-    st.pyplot(fig)
+            ax.set_title(f"Distribution de {selected_delta_col}")
+            ax.set_xlabel(selected_delta_col)
+            ax.set_ylabel("Densité")
+            ax.legend()
+            st.pyplot(fig)
 
-    # --- Statistiques descriptives ---
-    st.subheader("📊 Statistiques descriptives")
-    st.write(data.describe().to_frame().T)
+            # --- Statistiques descriptives ---
+            st.subheader("📊 Statistiques descriptives")
+            st.write(data.describe().to_frame().T)
 
-    # --- Asymétrie et aplatissement ---
-    from scipy.stats import skew, kurtosis
-    skewness = skew(data)
-    kurt = kurtosis(data)
-    st.write(f"**Asymétrie (Skewness)** : {skewness:.3f}")
-    st.write(f"**Aplatissement (Kurtosis)** : {kurt:.3f}")
+            # --- Asymétrie et aplatissement ---
+            from scipy.stats import skew, kurtosis
+            skewness = skew(data)
+            kurt = kurtosis(data)
+            st.write(f"**Asymétrie (Skewness)** : {skewness:.3f}")
+            st.write(f"**Aplatissement (Kurtosis)** : {kurt:.3f}")
 
-    # --- Test de normalité (Shapiro-Wilk) ---
-    from scipy.stats import shapiro
-    stat, p_value = shapiro(data)
-    st.subheader("🧪 Test de normalité (Shapiro-Wilk)")
-    st.write(f"Statistique de test : {stat:.4f}")
-    st.write(f"p-value : {p_value:.4f}")
+            # --- Test de normalité (Shapiro-Wilk) ---
+            from scipy.stats import shapiro
+            stat, p_value = shapiro(data)
+            st.subheader("🧪 Test de normalité (Shapiro-Wilk)")
+            st.write(f"Statistique de test : {stat:.4f}")
+            st.write(f"p-value : {p_value:.4f}")
 
-    if p_value > 0.05:
-        st.success("✅ L'échantillon suit une distribution normale (H₀ non rejetée).")
+            if p_value > 0.05:
+                st.success("✅ L'échantillon suit une distribution normale (H₀ non rejetée).")
+            else:
+                st.warning("⚠️ L'échantillon ne suit pas une distribution normale (H₀ rejetée).")
+
+        else:
+            st.warning("⚠️ Trop peu de données pour effectuer l’analyse.")
     else:
-        st.warning("⚠️ L'échantillon ne suit pas une distribution normale (H₀ rejetée).")
-
+        st.warning(f"⚠️ La colonne '{selected_delta_col}' n’est pas numérique.")
 else:
     st.warning("⚠️ Aucun échantillon valide trouvé pour effectuer l’analyse.")
 
