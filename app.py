@@ -6,7 +6,6 @@ from scipy import stats
 
 
 st.title("Analyse des erreurs")
-
 st.header("1. Intervalle de Confiance (IC)")
 st.write("La notion d'intervalle de confiance renvoie au degré de précision d’une moyenne ou d’un pourcentage. "
          "Elle s’appuie sur un échantillon et vise à estimer la fiabilité que l’on peut accorder aux valeurs observées "
@@ -25,7 +24,6 @@ st.write("La notion d'intervalle de confiance renvoie au degré de précision d�
 # 1. Charger les données
 # ---------------------------
 df = pd.read_csv("vols.csv", parse_dates=["[FK] Flight date"])
-
 # ---------------------------
 # 2. Sélection de la colonne Delta
 # ---------------------------
@@ -38,12 +36,14 @@ df[selected_delta_col] = (
     .str.replace(",", ".", regex=False)  # remplacer virgule par point
 )
 # S’assurer que la colonne choisie est bien numérique
+
 df[selected_delta_col] = pd.to_numeric(df[selected_delta_col], errors="coerce")
+
 # ---------------------------
 # Conversion en kg si nécessaire
 # ---------------------------
 if "en T" in selected_delta_col:   # Si le nom de la colonne contient "T"
-    st.info(f"⚖️ Conversion automatique de {selected_delta_col} en kilogrammes (kg)")
+    st.info(f" Conversion automatique de {selected_delta_col} en kilogrammes (kg)")
     df[selected_delta_col] = df[selected_delta_col] * 1000
 # ---------------------------
 
@@ -99,6 +99,7 @@ selected_types = st.sidebar.multiselect(
 )
 
 # ----- Dates avec un slider -----
+
 min_date = df["[FK] Flight date"].min()
 max_date = df["[FK] Flight date"].max()
 
@@ -139,11 +140,11 @@ df_filtered = df[
     (df["[FK] Flight date"].between(start_date, end_date))
 ]
 
-st.write(f"📊 Nombre de vols filtrés : **{len(df_filtered)}**")
+st.write(f"Nombre de vols filtrés : **{len(df_filtered)}**")
 
 
 # ==========================
-# 📈 ANALYSE DE LA DISTRIBUTION DE L'ÉCHANTILLON
+# ANALYSE DE LA DISTRIBUTION DE L'ÉCHANTILLON
 # ==========================
 st.header("2. Analyse de la Distribution de l'Échantillon")
 
@@ -175,7 +176,7 @@ if len(df_filtered) > 0:
             st.pyplot(fig)
 
             # --- Statistiques descriptives ---
-            st.subheader("📊 Statistiques descriptives")
+            st.subheader("Statistiques descriptives")
             st.write(data.describe().to_frame().T)
 
             # --- Asymétrie et aplatissement ---
@@ -206,24 +207,10 @@ else:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # ---------------------------
 # 5. Bootstrap et IC95%
 # ---------------------------
+
 df_filtered = df_filtered.dropna(subset=[selected_delta_col])
 
 if len(df_filtered) > 0:
@@ -248,35 +235,33 @@ if len(df_filtered) > 0:
     st.pyplot(fig)
 
 
+    # # ---------------------------
+    # # 6. Analyse des outliers
+    # # ---------------------------
+    # mean_delta = df_filtered[selected_delta_col].mean()
+    # std_delta = df_filtered[selected_delta_col].std()
 
+    # # Méthode 3 sigma
+    # outliers_sigma = df_filtered[np.abs(df_filtered[selected_delta_col] - mean_delta) > 3 * std_delta]
 
+    # # Méthode IQR
+    # Q1 = df_filtered[selected_delta_col].quantile(0.25)
+    # Q3 = df_filtered[selected_delta_col].quantile(0.75)
+    # IQR = Q3 - Q1
+    # outliers_iqr = df_filtered[
+    #     (df_filtered[selected_delta_col] < Q1 - 1.5 * IQR) |
+    #     (df_filtered[selected_delta_col] > Q3 + 1.5 * IQR)
+    # ]
 
-    # ---------------------------
-    # 6. Analyse des outliers
-    # ---------------------------
-    mean_delta = df_filtered[selected_delta_col].mean()
-    std_delta = df_filtered[selected_delta_col].std()
-
-    # Méthode 3 sigma
-    outliers_sigma = df_filtered[np.abs(df_filtered[selected_delta_col] - mean_delta) > 3 * std_delta]
-
-    # Méthode IQR
-    Q1 = df_filtered[selected_delta_col].quantile(0.25)
-    Q3 = df_filtered[selected_delta_col].quantile(0.75)
-    IQR = Q3 - Q1
-    outliers_iqr = df_filtered[
-        (df_filtered[selected_delta_col] < Q1 - 1.5 * IQR) |
-        (df_filtered[selected_delta_col] > Q3 + 1.5 * IQR)
-    ]
-
-    st.subheader("📌 Analyse des Outliers")
-    st.write("Vols outliers (méthode 3σ) :", outliers_sigma)
-    st.write("Vols outliers (méthode IQR) :", outliers_iqr)
+    # st.subheader("📌 Analyse des Outliers")
+    # st.write("Vols outliers (méthode 3σ) :", outliers_sigma)
+    # st.write("Vols outliers (méthode IQR) :", outliers_iqr)
     
 
     # ---------------------------
     # IC relatif par rapport à LIDO
     # ---------------------------
+    
     col_index = df_filtered.columns.get_loc(selected_delta_col)
     if col_index > 0:
         lido_col = df_filtered.columns[col_index - 1]
