@@ -28,9 +28,6 @@ df = pd.read_csv("vols.csv", parse_dates=["[FK] Flight date"])
 
 # ---------------------------
 # 2. Sélection de la colonne Delta
-
-# ---------------------------
-# 2. Sélection de la colonne Delta
 # ---------------------------
 delta_columns = [col for col in df.columns if "Delta" in col]
 selected_delta_col = st.selectbox("Choisir la colonne Delta à analyser", delta_columns)
@@ -42,14 +39,12 @@ df[selected_delta_col] = (
 )
 # S’assurer que la colonne choisie est bien numérique
 df[selected_delta_col] = pd.to_numeric(df[selected_delta_col], errors="coerce")
-
 # ---------------------------
 # Conversion en kg si nécessaire
 # ---------------------------
 if "en T" in selected_delta_col:   # Si le nom de la colonne contient "T"
     st.info(f"⚖️ Conversion automatique de {selected_delta_col} en kilogrammes (kg)")
     df[selected_delta_col] = df[selected_delta_col] * 1000
-
 # ---------------------------
 
 # S’assurer que la colonne choisie est bien numérique
@@ -58,16 +53,15 @@ df[selected_delta_col] = pd.to_numeric(df[selected_delta_col], errors="coerce")
 # ---------------------------
 # 3. Filtres (dans la sidebar à droite)
 # ---------------------------
-st.sidebar.header("📌 Filtres")
+st.sidebar.header("Filtres")
 
 # ----- CityPair -----
 city_options = sorted(df["[LIDO] Citypair"].dropna().unique().tolist())
 
-
 if "selected_cities" not in st.session_state:
     st.session_state.selected_cities = []
 
-search_city = st.sidebar.text_input("🔎 Rechercher un CityPair")
+search_city = st.sidebar.text_input("Rechercher un CityPair")
 
 if search_city:
     filtered_city_options = [c for c in city_options if search_city.lower() in c.lower()]
@@ -87,7 +81,6 @@ selected_cities = st.sidebar.multiselect(
     options=filtered_city_options,
     default=default_selected
 )
-
 
 # ----- Type Avion -----
 type_options = df["Type Avions IATA"].dropna().unique().tolist()
@@ -136,7 +129,6 @@ selected_area = st.sidebar.multiselect(
     default=st.session_state.selected_area
 )
 
-
 # ---------------------------
 # 4. Filtrage des données
 # ---------------------------
@@ -148,7 +140,6 @@ df_filtered = df[
 ]
 
 st.write(f"📊 Nombre de vols filtrés : **{len(df_filtered)}**")
-
 
 
 # ==========================
