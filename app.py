@@ -156,7 +156,7 @@ st.write(f"📊 Nombre de vols filtrés : **{len(df_filtered)}**")
 # ==========================
 st.header("2. Analyse de la Distribution de l'Échantillon")
 
-iif len(df_filtered) > 0:
+if len(df_filtered) > 0:
     # --- Vérification que la colonne est numérique ---
     if np.issubdtype(df_filtered[selected_delta_col].dtype, np.number):
         data = df_filtered[selected_delta_col].dropna()
