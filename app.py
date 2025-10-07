@@ -141,8 +141,6 @@ df_filtered = df[
 ]
 
 st.write(f"Nombre de vols filtrés : **{len(df_filtered)}**")
-
-
 # ==========================
 # ANALYSE DE LA DISTRIBUTION DE L'ÉCHANTILLON
 # ==========================
@@ -233,34 +231,9 @@ if len(df_filtered) > 0:
     ax.set_ylabel("Fréquence")
     ax.legend()
     st.pyplot(fig)
-
-
-    # # ---------------------------
-    # # 6. Analyse des outliers
-    # # ---------------------------
-    # mean_delta = df_filtered[selected_delta_col].mean()
-    # std_delta = df_filtered[selected_delta_col].std()
-
-    # # Méthode 3 sigma
-    # outliers_sigma = df_filtered[np.abs(df_filtered[selected_delta_col] - mean_delta) > 3 * std_delta]
-
-    # # Méthode IQR
-    # Q1 = df_filtered[selected_delta_col].quantile(0.25)
-    # Q3 = df_filtered[selected_delta_col].quantile(0.75)
-    # IQR = Q3 - Q1
-    # outliers_iqr = df_filtered[
-    #     (df_filtered[selected_delta_col] < Q1 - 1.5 * IQR) |
-    #     (df_filtered[selected_delta_col] > Q3 + 1.5 * IQR)
-    # ]
-
-    # st.subheader("📌 Analyse des Outliers")
-    # st.write("Vols outliers (méthode 3σ) :", outliers_sigma)
-    # st.write("Vols outliers (méthode IQR) :", outliers_iqr)
     
-
-    # ---------------------------
-    # IC relatif par rapport à LIDO
-    # ---------------------------
+    
+    
     
     col_index = df_filtered.columns.get_loc(selected_delta_col)
     if col_index > 0:
@@ -283,3 +256,76 @@ if len(df_filtered) > 0:
         st.error("⚠️ Impossible de trouver la colonne LIDO correspondante.")
 else:
     st.warning("⚠️ Aucun vol valide trouvé pour la colonne sélectionnée")
+    
+# ---------------------------
+# 3. Choix de la stratification
+# ---------------------------
+strat_col1 = st.selectbox("Stratifier par", ["Type Avions IATA", "Area"])
+strat_col2 = st.selectbox("Optionnelle: deuxième stratification", ["Aucune", "Type Avions IATA", "Area"])
+
+# ---------------------------
+# 4. Calculs par strat
+# ---------------------------
+def strat_analysis(df, value_col, strat_cols):
+    results = []
+    N_total = len(df)
+    
+    for name, group in df.groupby(strat_cols):
+        N_h = len(group)  # population de la strate
+        n_h = N_h        # si l'échantillon = population de la strate
+        mean_h = group[value_col].mean()
+        var_h = group[value_col].var(ddof=1)
+        
+        results.append({
+            "Strate": name,
+            "Nh": N_h,
+            "nh": n_h,
+            "Moyenne": mean_h,
+            "Variance": var_h
+        })
+    
+    res_df = pd.DataFrame(results)
+    
+    # Moyenne globale stratifiée
+    res_df["Pondération"] = res_df["Nh"] / res_df["Nh"].sum()
+    mean_global = np.sum(res_df["Moyenne"] * res_df["Pondération"])
+    
+    # Variance globale stratifiée
+    res_df["Var_Pondérée"] = (res_df["Pondération"]**2) * (res_df["Variance"]**2) / res_df["nh"] 
+    var_global = res_df["Var_Pondérée"].sum()
+    
+    return res_df, mean_global, var_global
+
+# Stratification principale
+strat_cols = [strat_col1]
+if strat_col2 != "Aucune" and strat_col2 != strat_col1:
+    strat_cols.append(strat_col2)
+
+# Δ
+delta_res, delta_mean_global, delta_var_global = strat_analysis(df, selected_delta_col, strat_cols)
+
+# LIDO (colonne précédente)
+col_index = df.columns.get_loc(selected_delta_col)
+lido_col = df.columns[col_index - 1]
+df[lido_col] = pd.to_numeric(df[lido_col], errors="coerce")
+lido_res, lido_mean_global, lido_var_global = strat_analysis(df, lido_col, strat_cols)
+
+# Erreur relative par strate
+delta_res["Erreur_rel (%)"] = (delta_res["Moyenne"] / lido_res["Moyenne"]) * 100
+global_erreur_rel = (delta_mean_global / lido_mean_global) * 100
+
+# ---------------------------
+# 5. Affichage
+# ---------------------------
+st.subheader("Moyenne et variance par strate pour Delta")
+st.write(delta_res)
+st.subheader("Moyenne et variance par strate pour LIDO")
+st.write(lido_res)
+
+st.subheader("Moyenne et variance globales")
+st.write(f"Moyenne Delta global = {delta_mean_global:.2f}, Var(Δ) global = {delta_var_global:.2f}")
+st.write(f"Moyenne LIDO global = {lido_mean_global:.2f}, Var(LIDO) global = {lido_var_global:.2f}")
+
+st.subheader("Erreur relative Δ / LIDO (%)")
+st.write(delta_res[["Strate", "Erreur_rel (%)"]])
+st.write(f"Erreur relative globale = {global_erreur_rel:.2f}%")
