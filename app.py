@@ -291,7 +291,7 @@ def strat_analysis(df, value_col, strat_cols):
     mean_global = np.sum(res_df["Moyenne"] * res_df["Pondération"])
     
     # Variance globale stratifiée
-    res_df["Var_Pondérée"] = (res_df["Pondération"]**2) * (res_df["Variance"]**2) / res_df["nh"] 
+    res_df["Var_Pondérée"] = (res_df["Pondération"]**2) * (res_df["Variance"]) / res_df["nh"] 
     var_global = res_df["Var_Pondérée"].sum()
     
     return res_df, mean_global, var_global
