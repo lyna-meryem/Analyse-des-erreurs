@@ -314,7 +314,7 @@ lido_res, lido_mean_global, lido_var_global = strat_analysis(df, lido_col, strat
 
 
 # Erreur relative par strate (IC 95%)
-delta_res["Erreur_rel (%)"] = (np.sqrt(abs(delta_res["Var_Pondérée"])) * 1.96 / delta_res["Moyenne"]) * 100
+delta_res["Erreur_rel (%)"] = (np.sqrt(delta_res["Var_Pondérée"]) * 1.96 / delta_res["Moyenne"]) * 100
 
 # Erreur relative globale
 global_erreur_rel = (np.sqrt(delta_var_global) * 1.96 / delta_mean_global) * 100
