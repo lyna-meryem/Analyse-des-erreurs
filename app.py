@@ -291,7 +291,7 @@ def strat_analysis(df, value_col, strat_cols):
     mean_global = np.sum(res_df["Moyenne"] * res_df["Pondération"])
     
     # Variance globale stratifiée
-    res_df["Var_Pondérée"] = (res_df["Pondération"]**2) * (res_df["Variance"]**2) / res_df["nh"] 
+    res_df["Var_Pondérée"] = (res_df["Pondération"]**2) * (res_df["Variance"]) / res_df["nh"] 
     var_global = res_df["Var_Pondérée"].sum()
     
     return res_df, mean_global, var_global
@@ -314,7 +314,7 @@ lido_res, lido_mean_global, lido_var_global = strat_analysis(df, lido_col, strat
 
 
 # Erreur relative par strate (IC 95%)
-delta_res["Erreur_rel (%)"] = (np.sqrt(delta_res["Var_Pondérée"]) * 1.96 / delta_res["Moyenne"]) * 100
+# delta_res["Erreur_rel (%)"] = (np.sqrt(abs(delta_res["Var_Pondérée"])) * 1.96 / delta_res["Moyenne"]) * 100
 
 # Erreur relative globale
 global_erreur_rel = (np.sqrt(delta_var_global) * 1.96 / delta_mean_global) * 100
