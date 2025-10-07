@@ -311,8 +311,10 @@ df[lido_col] = pd.to_numeric(df[lido_col], errors="coerce")
 lido_res, lido_mean_global, lido_var_global = strat_analysis(df, lido_col, strat_cols)
 
 # Erreur relative par strate
-delta_res["Erreur_rel (%)"] = (delta_res["Moyenne"] / lido_res["Moyenne"]) * 100
-global_erreur_rel = (delta_mean_global / lido_mean_global) * 100
+
+
+delta_res["Erreur_rel (%)"] = np.sqrt(delta_res["Var_Pondérée"])*1,96
+global_erreur_rel = (delta_res["Erreur_rel (%)"] /delta_res["Moyenne"]) * 100
 
 # ---------------------------
 # 5. Affichage
